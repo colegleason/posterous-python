@@ -16,12 +16,13 @@ from posterous.utils import *
 
 class API(object):
     def __init__(self, username=None, password=None, 
-                 host='https://posterous.com', api_root='/api', parser=None):
+                 host='https://posterous.com', api_root='/api/2', parser=None):
         self.username = username
         self.password = password
         self.host = host
         self.api_root = api_root
         self.parser = parser or ModelParser()
+        
 
     ## API methods 
     """
@@ -44,18 +45,31 @@ class API(object):
                           than one type is allowed, place the types in a tuple.
         'require_auth'  - True if the API method requires authentication.
     """
-    
+    ## Authentication
+    """
+    Returns the users api token.
+    """
+    get_api_token = bind_method(
+        path = 'auth/token',
+        payload_type = 'api_token',
+        payload_list = True,
+        allowed_param = [
+            ('username', str),
+            ('password', str)],
+        auth_type = "basic"
+    )
+
     ## Reading 
     """
     Returns a list of all sites owned and authored by the 
     authenticated user.
     """
     get_sites = bind_method(
-        path = 'getsites',
+        path = 'users/me/sites',
         payload_type = 'site',
         payload_list = True,
         allowed_param = [],
-        require_auth = True
+        auth_type = "basic"
     )
 
     """
@@ -69,11 +83,11 @@ class API(object):
         payload_list = True,
         allowed_param = [
             ('site_id', int), 
-            ('hostname', basestring), 
+            ('hostname', str), 
             ('num_posts', int), 
             ('page', int),
-            ('tag', basestring)],
-        require_auth = False
+            ('tag', str)],
+        auth_type = None
     )
 
     """
@@ -85,8 +99,8 @@ class API(object):
     get_post = bind_method(
         path = 'getpost',
         payload_type = 'post',
-        allowed_param = [('id', basestring)],
-        require_auth = False
+        allowed_param = [('id', str)],
+        auth_type = None
     )
         
     """
@@ -101,8 +115,8 @@ class API(object):
         payload_list = True,
         allowed_param = [
             ('site_id', int),
-            ('hostname', basestring)],
-        require_auth = False
+            ('hostname', str)],
+        auth_type = None
     )
 
     ## Posting
@@ -117,16 +131,16 @@ class API(object):
         payload_type = 'post',
         allowed_param = [
             ('site_id', int), 
-            ('title', basestring),
-            ('body', basestring), 
-            ('media', (basestring, list)), 
+            ('title', str),
+            ('body', str), 
+            ('media', (str, list)), 
             ('autopost', bool), 
             ('private', bool), 
             ('date', datetime), 
-            ('tags', basestring), 
-            ('source', basestring), 
-            ('sourceLink', basestring)],
-        require_auth = True
+            ('tags', str), 
+            ('source', str), 
+            ('sourceLink', str)],
+        auth_type = "basic"
     )
 
     """
@@ -140,10 +154,10 @@ class API(object):
         payload_type = 'post',
         allowed_param = [
             ('post_id', int),
-            ('title', basestring),
-            ('body', basestring), 
-            ('media', (basestring, list))],
-        require_auth = True
+            ('title', str),
+            ('body', str), 
+            ('media', (str, list))],
+        auth_type = "basic"
     )
    
     """
@@ -159,11 +173,11 @@ class API(object):
         payload_type = 'comment',
         allowed_param = [
             ('post_id', int), 
-            ('comment', basestring),
-            ('name', basestring),
-            ('email', basestring),
+            ('comment', str),
+            ('name', str),
+            ('email', str),
             ('date', datetime)],
-        require_auth = True
+        auth_type = "basic"
     )
 
     ## Twitter
@@ -185,13 +199,13 @@ class API(object):
         payload_type = 'json',
         response_type = 'json',
         allowed_params = [
-            ('username', basestring), 
-            ('password', basestring), 
-            ('media', (basestring, list)),
-            ('message', basestring),
-            ('body', basestring),
-            ('source', basestring),
-            ('sourceLink', basestring)]
+            ('username', str), 
+            ('password', str), 
+            ('media', (str, list)),
+            ('message', str),
+            ('body', str),
+            ('source', str),
+            ('sourceLink', str)]
     )
         
     """
@@ -204,12 +218,12 @@ class API(object):
         payload_type = 'json',
         response_type = 'json',
         allowed_params = [
-            ('username', basestring), 
-            ('password', basestring), 
-            ('media', (basestring, list)),
-            ('message', basestring),
-            ('body', basestring),
-            ('source', basestring),
-            ('sourceLink', basestring)]
+            ('username', str), 
+            ('password', str), 
+            ('media', (str, list)),
+            ('message', str),
+            ('body', str),
+            ('source', str),
+            ('sourceLink', str)]
     )
         

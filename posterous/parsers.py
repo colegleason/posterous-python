@@ -98,7 +98,7 @@ class XMLParser(object):
         pass
 
     def parse(self, method, payload):
-        """Parses the XML payload and returns a dict of objects"""
+        """Parses the JSON payload and returns a dict of objects"""
         root = ET.XML(payload)
         
         if root.tag != 'rsp':
@@ -172,8 +172,7 @@ class ModelParser(object):
                 return
             model = getattr(self.model_factory, method.payload_type)
         except AttributeError:
-            raise Exception('No model for this payload type: %s' % 
-                            method.payload_type)
+            raise Exception('No model for this payload type: {0}'.format(method.payload_type))
 
         # The payload XML must be parsed into a dict of objects before
         # being used in the model.

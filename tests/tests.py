@@ -74,4 +74,4 @@ def test_post_xml_parser():
         assert vid.flv == "http://posterous.com/getfile/files.posterous.com/sachin/DIptatiCkiv/movie.flv"
         assert vid.mp4 == "http://posterous.com/getfile/files.posterous.com/sachin/DIptatiCkiv/movie.mp4"
         
-    
+

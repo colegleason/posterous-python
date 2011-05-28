@@ -34,7 +34,7 @@ class Post(Model):
     @classmethod
     def parse_obj(self, api, json):
         post = self(api)
-        for k, v in json.iteritems():
+        for k, v in json.items():
             if k == 'media':
                 setattr(post, k, Media.parse(api, v))
             elif k == 'comments':
@@ -54,7 +54,7 @@ class Site(Model):
     @classmethod
     def parse_obj(self, api, json):
         site = self(api)
-        for k, v in json.iteritems():
+        for k, v in json.items():
             setattr(site, k, v)
         return site
 
@@ -72,7 +72,7 @@ class Comment(Model):
     @classmethod
     def parse_obj(self, api, json):
         comment = self(api)
-        for k, v in json.iteritems():
+        for k, v in json.items():
             setattr(comment, k, v)
         return comment
 
@@ -81,7 +81,7 @@ class Tag(Model):
     @classmethod
     def parse_obj(self, api, json):
         tag = self(api)
-        for k, v in json.iteritems():
+        for k, v in json.items():
             setattr(tag, k, v)
         return tag
 
@@ -97,7 +97,7 @@ class Media(Model):
     def parse_obj(self, api, json, obj=None):
         # attributes from the medium tag are set on original Media object.
         media = obj or self(api)
-        for k, v in json.iteritems():
+        for k, v in json.items():
             if k == 'medium':
                 Media.parse_obj(api, v, media)
             elif k == 'thumb':

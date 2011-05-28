@@ -2,14 +2,14 @@
     needs python 2.6
 """
 
-from __future__ import with_statement
+
 from optparse import OptionParser
 import logging 
 import datetime
 import os, os.path
 import re
 import sys
-import urlparse, urllib
+import urllib.parse, urllib.request, urllib.parse, urllib.error
 import simplejson
 
 from posterous.api import Posterous
@@ -75,7 +75,7 @@ if __name__ == '__main__':
         logging.basicConfig(level=logging.WARNING)
     
     if not options.username or not options.password:
-        print "You must provide a username and password.\n"
+        print("You must provide a username and password.\n")
         opt_parser.print_help()
         sys.exit()
 
@@ -97,14 +97,14 @@ if __name__ == '__main__':
             os.mkdir(private_folder)
 
         site_file = os.path.join(site_folder, 'site-%s.json' % site.hostname)
-        logging.debug(u"Opening file '%s' for site '%s' (%s)" % 
+        logging.debug("Opening file '%s' for site '%s' (%s)" % 
                       (site_file, site.hostname, site.id))
 
         with open(site_file, 'w+') as sf:
             simplejson.dump(site, sf, cls=JsonDateEncoder)
             
         rem = 2 if site.num_posts % options.batch_size > 0 else 1
-        page_numbers = range(1, int(site.num_posts/options.batch_size) + rem)
+        page_numbers = list(range(1, int(site.num_posts/options.batch_size) + rem))
 
         for page in page_numbers:
             logging.info("Retrieving page %s of %s with %s posts per page" % 
@@ -112,10 +112,10 @@ if __name__ == '__main__':
             
             for p in posterous.get_posts(site_id=site.id, page_num=page, 
                                          num_posts=options.batch_size):
-                post_slug = re.sub(r'^/', '', urlparse.urlparse(p.link).path)
+                post_slug = re.sub(r'^/', '', urllib.parse.urlparse(p.link).path)
                 post_file = os.path.join(site_folder, '%s.json' % post_slug)
             
-                logging.debug(u"Opening file '%s' for post '%s'" % 
+                logging.debug("Opening file '%s' for post '%s'" % 
                               (post_file, p.title))
 
                 with open(post_file, 'w+') as f:
@@ -130,4 +130,4 @@ if __name__ == '__main__':
                     logging.debug("Getting media for post '%s' from url '%s'" %
                                   (p.title, u))
                 
-                    urllib.urlretrieve(u, media_file)
+                    urllib.request.urlretrieve(u, media_file)

@@ -29,14 +29,14 @@ def parse_datetime(time_string):
 def strip_dict(d):
     """Returns a new dictionary with keys that had a value"""
     ret = {}
-    for k, v in d.items():
+    for k, v in list(d.items()):
         if v: ret[k] = v
     return ret
 
 def enc_utf8_str(arg):
     """ Convenience func for encoding a value into a utf8 string """
     # written by Michael Norton (http://docondev.blogspot.com/)
-    if isinstance(arg, unicode):
+    if isinstance(arg, str):
         arg = arg.encode('utf-8')
     elif not isinstance(arg, str):
         arg = str(arg)
@@ -50,5 +50,5 @@ def import_simplejson():
             # they may have django
             from django.utils import simplejson as json
         except ImportError:
-            raise ImportError, "Can't load a json library"
+            raise ImportError("Can't load a json library")
     return json
