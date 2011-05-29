@@ -1,63 +1,48 @@
-# Copyright:
-#    Copyright (c) 2010, Benjamin Reitzammer <http://github.com/nureineide>, 
-#    All rights reserved.
-#            
-# License:
-#    This program is free software. You can distribute/modify this program under
-#    the terms of the Apache License Version 2.0 available at 
-#    http://www.apache.org/licenses/LICENSE-2.0.txt 
-
-import urllib.request, urllib.parse, urllib.error
-from datetime import datetime
-from base64 import b64encode
-
-from posterous.utils import enc_utf8_str
-
-
 def bind_method(**options):
-
+    
+    
     class APIMethod(object):
-        # Get the options for the api method
+        # Required arguments
         path = options['path']
-        payload_type = options.get('payload_type', None)
-        payload_list = options.get('payload_list', False)
-        response_type = options.get('response_type', 'xml')
-        allowed_param = options.get('allowed_param', [])
+        # Optional arguments
         method = options.get('method', 'GET')
+        response_type = options.get('response_type', None)
         auth_type = options.get('auth_type', None)
-
+        allowed_params = options.get('parameters', [])
+        
         def __init__(self, api, args, kwargs):
-            # If the method requires authentication and no credentials
-            # are provided, throw an error.  If credentials are 
-            # provided, get and API token.
-            if self.auth_type == "basic" and not (api.username and api.password):
-                raise Exception('Authentication is required!')
-            elif self.auth_type == "token" and not (api.token):
-                if not (api.username and api.password):
-                    raise Exception('Authentication is required!')
-                else:
-                    self._get_api_token(api.username, api.password)
-
             self.api = api
-            self.headers = kwargs.pop('headers', {})
-            self.auth_url = api.auth_url
-            self.api_url = api.host + api.api_root
-            self._build_parameters(args, kwargs)
-
-        def _get_api_token(self, username, password):
-            url = self.api_url + '/' + self.auth_url
-            auth = b64encode('{0}:{1}'.format(
-                    self.api.username, 
-                    self.api.password).encode('latin-1'))
-            self.headers['Authorization'] = 'Basic %s'.format(auth)
+            self.headers = kwargs['headers']
+            _check_authentication(api, auth_type)
+            _check_params(args, kwargs)
             
+        def _check_authentication(self, api, auth_type):
+            if auth_type == None:
+                pass
+            elif auth_type == 'basic':
+                if not (api.username and api.password):
+                    raise Exception("You must suppy a username and password!")
+                else:
+                    creds = '{0}:{1}'.format(self.api.username, self.api.password)
+                    auth = b64encode(creds.encode('latin-1'))
+                    self.headers['Authorization'] = 'Basic %s'.format(auth)
+            elif api_type = 'token':
+                if api.api_token:
+                    self.parameters['api_token'] = api.api_token
+                elif not api.api_token and (self.api.username and self.api.password):
+                    api.auth_token = api.get_api_token()
+                else:
+                    raise Exception("You must suppy a username and password!")
+            else:
+                raise Exception("Not a valid authentication type.")
+                
         def _build_parameters(self, args, kwargs):
             self.parameters = []
             
             args = list(args)
             args.reverse()
 
-            for name, p_type in self.allowed_param:
+            for name, p_type in self.allowed_params:
                 value = None
                 if args:
                     value = args.pop()
@@ -105,7 +90,7 @@ def bind_method(**options):
 
         def execute(self):
             # Build request URL
-            url = self.api_url + '/' + self.path
+            url = self.api_url + self.path
 
             # Apply authentication if required
             if self.auth_type = "basic":
@@ -114,9 +99,8 @@ def bind_method(**options):
                         self.api.password).encode('latin-1'))
                 self.headers['Authorization'] = 'Basic %s'.format(auth)
             if self.auth_type = "token":
-                self.headers['api_token'] = self.api.api_token
+                self.parameters['api_token'] = self.api.api_token
                 
-           
             # Encode the parameters
             post_data = None
             if self.method == 'POST':
@@ -141,3 +125,4 @@ def bind_method(**options):
 
     return _call
 
+            
